@@ -12,8 +12,13 @@ app.use(express.urlencoded({ extended: true }));
 
 connectDB();
 
+// Rutas de autenticación
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
+
+// Rutas de becados
+const becadosRoutes = require('./routes/becados');
+app.use('/api/becados', becadosRoutes);
 
 app.get('/', (req, res) => {
   res.json({ 
@@ -24,7 +29,9 @@ app.get('/', (req, res) => {
     endpoints: {
       register: 'POST /api/auth/register',
       login: 'POST /api/auth/login',
-      health: 'GET /api/health'
+      health: 'GET /api/health',
+      becadosAprobados: 'GET /api/becados/aprobados',
+      estadisticas: 'GET /api/becados/estadisticas'
     }
   });
 });
@@ -45,6 +52,6 @@ app.listen(PORT, () => {
   console.log('║   🚀 SERVIDOR INICIADO EXITOSAMENTE       ║');
   console.log('╠════════════════════════════════════════════╣');
   console.log(`║   📍 URL: http://localhost:${PORT}            ║`);
-  console.log(`║   🌍 Entorno: ${process.env.NODE_ENV}                ║`);
+  console.log(`║   🌍 Entorno: ${process.env.NODE_ENV || 'development'}                ║`);
   console.log('╚════════════════════════════════════════════╝\n');
 });
