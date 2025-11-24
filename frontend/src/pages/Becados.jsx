@@ -1,36 +1,57 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 export default function Becados() {
-  const testimonios = [
-    {
-      id: 1,
-      name: 'María González',
-      university: 'Universidad Nacional Mayor de San Marcos',
-      career: 'Ingeniería de Sistemas',
-      course: 'Desarrollo Web Full Stack',
-      image: '👩‍💻',
-      testimonial: 'Gracias al programa de becas pude aprender desarrollo web sin preocuparme por los costos. Ahora trabajo como desarrolladora frontend.'
-    },
-    {
-      id: 2,
-      name: 'Carlos Ramírez',
-      university: 'Universidad Nacional de Ingeniería',
-      career: 'Ingeniería Industrial',
-      course: 'Data Science con Python',
-      image: '👨‍💼',
-      testimonial: 'El programa de becas me permitió especializarme en Data Science. Conseguí una pasantía en una empresa tech gracias a lo aprendido.'
-    },
-    {
-      id: 3,
-      name: 'Ana Torres',
-      university: 'Pontificia Universidad Católica del Perú',
-      career: 'Administración',
-      course: 'Marketing Digital',
-      image: '👩‍🎓',
-      testimonial: 'Como becada pude acceder a cursos de marketing digital que complementaron mi carrera. Ahora manejo las redes sociales de una startup.'
+  const [becados, setBecados] = useState([]);
+  const [estadisticas, setEstadisticas] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchBecados();
+    fetchEstadisticas();
+  }, []);
+
+  const fetchBecados = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/becados/aprobados');
+      setBecados(response.data.becados);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error al cargar becados:', error);
+      setLoading(false);
     }
-  ];
+  };
+
+  const fetchEstadisticas = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/becados/estadisticas');
+      setEstadisticas(response.data.estadisticas);
+    } catch (error) {
+      console.error('Error al cargar estadísticas:', error);
+    }
+  };
+
+  const getInitials = (name) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
+  const getRandomColor = (index) => {
+    const colors = [
+      'from-blue-500 to-blue-600',
+      'from-purple-500 to-purple-600',
+      'from-green-500 to-green-600',
+      'from-pink-500 to-pink-600',
+      'from-indigo-500 to-indigo-600',
+      'from-teal-500 to-teal-600',
+    ];
+    return colors[index % colors.length];
+  };
 
   const requisitos = [
     {
@@ -75,6 +96,29 @@ export default function Becados() {
           <p className="text-xl text-green-100 mb-8">
             Apoyamos tu crecimiento académico y profesional
           </p>
+          
+          {/* Estadísticas */}
+          {estadisticas && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8">
+              <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
+                <div className="text-3xl font-bold">{estadisticas.total}</div>
+                <div className="text-sm text-green-100">Total Solicitudes</div>
+              </div>
+              <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
+                <div className="text-3xl font-bold">{estadisticas.aprobados}</div>
+                <div className="text-sm text-green-100">Becas Aprobadas</div>
+              </div>
+              <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
+                <div className="text-3xl font-bold">{estadisticas.pendientes}</div>
+                <div className="text-sm text-green-100">En Revisión</div>
+              </div>
+              <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
+                <div className="text-3xl font-bold">{estadisticas.tasaAprobacion}%</div>
+                <div className="text-sm text-green-100">Tasa Aprobación</div>
+              </div>
+            </div>
+          )}
+          
           <Link
             to="/register"
             className="bg-white text-green-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition inline-block shadow-lg"
@@ -84,8 +128,86 @@ export default function Becados() {
         </div>
       </section>
 
+      {/* Becados Aprobados */}
+      {becados.length > 0 && (
+        <section className="py-16 px-4">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-4xl font-bold text-center text-gray-800 mb-4">
+              🌟 Nuestros Becados
+            </h2>
+            <p className="text-center text-gray-600 mb-12">
+              Conoce a los estudiantes que ya forman parte de nuestro programa
+            </p>
+            
+            {loading ? (
+              <div className="text-center py-12">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <p className="mt-4 text-gray-600">Cargando becados...</p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {becados.map((becado, index) => (
+                  <div key={becado._id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition transform hover:-translate-y-2">
+                    <div className={`bg-gradient-to-br ${getRandomColor(index)} p-8 text-center`}>
+                      <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto text-2xl font-bold text-gray-800">
+                        {getInitials(becado.fullName)}
+                      </div>
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold text-gray-800 mb-1">
+                        {becado.fullName}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-1">
+                        🏛️ {becado.scholarship.university}
+                      </p>
+                      <p className="text-sm text-green-600 font-semibold mb-3">
+                        📚 {becado.scholarship.career}
+                      </p>
+                      {becado.scholarship.motivation && (
+                        <div className="bg-blue-50 rounded-lg p-3 mb-3">
+                          <p className="text-xs text-gray-700 italic line-clamp-3">
+                            "{becado.scholarship.motivation}"
+                          </p>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span>✅ Beca Aprobada</span>
+                        <span>
+                          {new Date(becado.createdAt).toLocaleDateString('es-PE')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* Si no hay becados aprobados */}
+      {!loading && becados.length === 0 && (
+        <section className="py-16 px-4">
+          <div className="max-w-2xl mx-auto text-center bg-white rounded-2xl shadow-lg p-8">
+            <div className="text-6xl mb-4">🎓</div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">
+              ¡Sé el Primero!
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Aún no hay becados aprobados. Solicita tu beca ahora y sé parte de nuestra primera generación.
+            </p>
+            <Link
+              to="/register"
+              className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition inline-block"
+            >
+              Solicitar Beca
+            </Link>
+          </div>
+        </section>
+      )}
+
       {/* Requisitos */}
-      <section className="py-16 px-4">
+      <section className="py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center text-gray-800 mb-4">
             Requisitos para Becados
@@ -96,7 +218,7 @@ export default function Becados() {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {requisitos.map((req, index) => (
-              <div key={index} className="bg-white p-6 rounded-xl shadow-lg text-center">
+              <div key={index} className="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-xl text-center hover:shadow-lg transition">
                 <div className="text-5xl mb-4">{req.icon}</div>
                 <h3 className="font-bold text-gray-800 mb-2">{req.title}</h3>
                 <p className="text-gray-600 text-sm">{req.description}</p>
@@ -107,7 +229,7 @@ export default function Becados() {
       </section>
 
       {/* Beneficios */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center text-gray-800 mb-12">
             Beneficios del Programa
@@ -115,46 +237,9 @@ export default function Becados() {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {beneficios.map((beneficio, index) => (
-              <div key={index} className="flex items-start space-x-3 bg-green-50 p-4 rounded-lg">
+              <div key={index} className="flex items-start space-x-3 bg-white p-4 rounded-lg shadow hover:shadow-lg transition">
                 <span className="text-2xl">{beneficio.split(' ')[0]}</span>
                 <p className="text-gray-700 font-medium">{beneficio.substring(3)}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonios */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center text-gray-800 mb-4">
-            Historias de Éxito
-          </h2>
-          <p className="text-center text-gray-600 mb-12">
-            Conoce a algunos de nuestros becados destacados
-          </p>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonios.map((testimonio) => (
-              <div key={testimonio.id} className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                <div className="bg-gradient-to-br from-green-500 to-teal-500 p-8 text-center">
-                  <div className="text-8xl mb-4">{testimonio.image}</div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-800 mb-1">
-                    {testimonio.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-1">{testimonio.university}</p>
-                  <p className="text-sm text-green-600 font-semibold mb-2">{testimonio.career}</p>
-                  <div className="bg-blue-50 rounded-lg p-3 mb-4">
-                    <p className="text-xs text-blue-800 font-semibold">
-                      📚 Curso: {testimonio.course}
-                    </p>
-                  </div>
-                  <p className="text-gray-700 text-sm italic">
-                    "{testimonio.testimonial}"
-                  </p>
-                </div>
               </div>
             ))}
           </div>
@@ -186,9 +271,9 @@ export default function Becados() {
                 2
               </div>
               <div>
-                <h3 className="text-xl font-bold mb-2">Sube tus documentos</h3>
+                <h3 className="text-xl font-bold mb-2">Envía tu solicitud</h3>
                 <p className="text-blue-100">
-                  Adjunta tu comprobante de matrícula actualizado y escribe una carta de motivación breve.
+                  Completa tu perfil con comprobante de matrícula y carta de motivación breve.
                 </p>
               </div>
             </div>
