@@ -66,10 +66,10 @@ npm start
 
 ##  Contacto
 
-- Facebook: https://facebook.com/tuempresa
-- Instagram: https://instagram.com/tuempresa
-- LinkedIn: https://linkedin.com/company/tuempresa
-- Email: contacto@tuempresa.com
+- Facebook: https://www.facebook.com/carlos.florestorres.50/
+- Instagram: https://instagram.com/carlos.florestorres.50/
+- LinkedIn: https://www.linkedin.com/in/hector-carlos-flores-torres-109a71380/
+- Email: frecalo12@gmail.com
 
 ##  Licencia
 
