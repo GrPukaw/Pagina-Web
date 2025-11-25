@@ -85,7 +85,8 @@ router.post('/login', async (req, res) => {
       });
     }
     
-    if (user.userType === 'becado' && user.scholarship.status === 'pending') {
+    // Verificar si es becado pendiente (pero NO si es admin)
+    if (user.userType === 'becado' && user.scholarship && user.scholarship.status === 'pending') {
       return res.status(403).json({ 
         success: false,
         message: 'Tu solicitud de beca está en revisión. Te notificaremos pronto.' 
@@ -117,7 +118,8 @@ router.post('/login', async (req, res) => {
     console.error('Error en login:', error);
     res.status(500).json({ 
       success: false,
-      message: 'Error al iniciar sesión' 
+      message: 'Error al iniciar sesión',
+      error: error.message
     });
   }
 });

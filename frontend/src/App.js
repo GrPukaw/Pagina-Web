@@ -8,6 +8,8 @@ import Register from './pages/Register';
 import Cursos from './pages/Cursos';
 import Becados from './pages/Becados';
 import Contacto from './pages/Contacto';
+import ProtectedRoute from './components/ProtectedRoute';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -22,6 +24,16 @@ function App() {
             <Route path="/cursos" element={<Cursos />} />
             <Route path="/becados" element={<Becados />} />
             <Route path="/contacto" element={<Contacto />} />
+            
+            {/* Ruta protegida solo para admins */}
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
           </Routes>
         </div>
       </Router>

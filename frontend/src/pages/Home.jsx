@@ -14,7 +14,7 @@ export default function Home() {
         
         <div className="max-w-6xl mx-auto text-center relative z-10">
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
-            Aprende sin límites
+            BIENVENIDO A LA PLATAFORMA EDUCATIVA PUENTEX
           </h1>
           <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto">
             Accede a cursos de calidad, obtén becas universitarias y desarrolla tus habilidades con nuestra plataforma educativa
@@ -45,7 +45,7 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center transform hover:scale-105 transition">
               <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-4xl">📝</span>
+                <span className="text-4xl">📘</span>
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">1. Regístrate</h3>
               <p className="text-gray-600">

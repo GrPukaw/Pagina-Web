@@ -1,8 +1,8 @@
-# 🎓 Plataforma Educativa
+#  Plataforma Educativa 
 
 Plataforma web moderna para cursos online con sistema de becas universitarias.
 
-## 🚀 Características
+##  Características
 
 - ✅ Sistema de autenticación (Login/Registro)
 - ✅ Registro diferenciado: Becados vs Compradores
@@ -12,7 +12,7 @@ Plataforma web moderna para cursos online con sistema de becas universitarias.
 - ✅ Base de datos MongoDB
 - ✅ API REST completa
 
-## 🛠️ Tecnologías
+##  Tecnologías
 
 **Frontend:**
 - React 18
@@ -26,7 +26,7 @@ Plataforma web moderna para cursos online con sistema de becas universitarias.
 - JWT Authentication
 - Bcrypt
 
-## 📦 Instalación
+##  Instalación
 
 ### Backend
 ```bash
@@ -53,28 +53,28 @@ npm install
 npm start
 ```
 
-## 🌐 URLs
+##  URLs
 
 - Frontend: http://localhost:3000
 - Backend: http://localhost:5000
 
-## 👥 Tipos de Usuario
+##  Tipos de Usuario
 
 - **Becado**: Estudiante universitario con acceso a becas
 - **Comprador**: Usuario regular que adquiere cursos
 - **Admin**: Gestiona usuarios, becas y contenido
 
-## 📧 Contacto
+##  Contacto
 
 - Facebook: https://facebook.com/tuempresa
 - Instagram: https://instagram.com/tuempresa
 - LinkedIn: https://linkedin.com/company/tuempresa
 - Email: contacto@tuempresa.com
 
-## 📄 Licencia
+##  Licencia
 
 MIT
 
 ---
 
-Desarrollado con ❤️ por [Tu Nombre]
+Desarrollado por [Puka]
