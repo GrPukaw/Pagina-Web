@@ -8,6 +8,8 @@ import Register from './pages/Register';
 import Cursos from './pages/Cursos';
 import Becados from './pages/Becados';
 import Contacto from './pages/Contacto';
+import ForgotPassword from './pages/ForgotPassword'; 
+import ResetPassword from './pages/ResetPassword';   
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './pages/AdminDashboard';
 
@@ -25,7 +27,10 @@ function App() {
             <Route path="/becados" element={<Becados />} />
             <Route path="/contacto" element={<Contacto />} />
             
-            {/* Ruta protegida solo para admins */}
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
+            
+            {/* Solo admin*/}
             <Route 
               path="/admin" 
               element={
