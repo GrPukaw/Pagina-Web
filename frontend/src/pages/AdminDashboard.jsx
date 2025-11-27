@@ -65,11 +65,11 @@ export default function AdminDashboard() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert('❌ Beca rechazada');
+      alert('Beca rechazada');
       fetchData();
     } catch (error) {
       console.error('Error al rechazar:', error);
-      alert('❌ Error al rechazar la beca');
+      alert('Error al rechazar la beca');
     } finally {
       setProcesando(null);
     }
@@ -193,14 +193,14 @@ export default function AdminDashboard() {
                       disabled={procesando === becado._id}
                       className="flex-1 bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {procesando === becado._id ? '⏳ Procesando...' : '✅ Aprobar Beca'}
+                      {procesando === becado._id ? '⏳ Procesando...' : 'Aprobar Beca'}
                     </button>
                     <button
                       onClick={() => handleRechazar(becado._id, becado.fullName)}
                       disabled={procesando === becado._id}
                       className="flex-1 bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {procesando === becado._id ? '⏳ Procesando...' : '❌ Rechazar Beca'}
+                      {procesando === becado._id ? '⏳ Procesando...' : 'Rechazar Beca'}
                     </button>
                   </div>
                 </div>
