@@ -4,52 +4,52 @@ export default function Contacto() {
   const socialLinks = [
     {
       name: 'Facebook',
-      icon: '📘',
-      url: 'https://facebook.com/tuempresa',
+      icon: '📘 f',
+      url: 'https://www.facebook.com/carlos.florestorres.50/',
       color: 'from-blue-600 to-blue-700',
       description: 'Síguenos para novedades y eventos'
     },
     {
       name: 'Instagram',
       icon: '📸',
-      url: 'https://instagram.com/tuempresa',
+      url: 'https://www.instagram.com/carlos.florestorres.50/',
       color: 'from-purple-600 via-pink-500 to-orange-400',
       description: 'Contenido exclusivo y tips diarios'
     },
     {
       name: 'LinkedIn',
       icon: '💼',
-      url: 'https://linkedin.com/company/tuempresa',
+      url: 'https://www.linkedin.com/in/hector-carlos-flores-torres-109a71380/',
       color: 'from-blue-700 to-blue-800',
       description: 'Conecta con nuestra comunidad profesional'
     },
     {
       name: 'Twitter',
-      icon: '🐦',
-      url: 'https://twitter.com/tuempresa',
+      icon: '✖️☑️',
+      url: 'https://twitter.com',
       color: 'from-sky-500 to-sky-600',
       description: 'Últimas actualizaciones en tiempo real'
     },
     {
       name: 'WhatsApp',
-      icon: '💬',
-      url: 'https://wa.me/51999999999',
+      icon: '🟢📱💬',
+      url: 'https://wa.me/+51985226470',
       color: 'from-green-500 to-green-600',
       description: 'Atención directa e inmediata'
     },
     {
       name: 'Email',
       icon: '✉️',
-      url: 'mailto:contacto@tuempresa.com',
+      url: 'frecalo12@gmail.com',
       color: 'from-red-500 to-red-600',
       description: 'Escríbenos tus consultas'
     }
   ];
 
   const contactInfo = [
-    { icon: '📍', title: 'Dirección', content: 'Lima, Perú' },
+    { icon: '🚩', title: 'Dirección', content: 'Juliaca - Perú' },
     { icon: '🕐', title: 'Horario', content: 'Lun-Vie: 9:00 AM - 6:00 PM' },
-    { icon: '🌐', title: 'Sitio Web', content: 'www.tuempresa.com' }
+    { icon: '🌐', title: 'Sitio Web', content: 'Proximamente' }
   ];
 
   const handleSocialClick = (url) => {

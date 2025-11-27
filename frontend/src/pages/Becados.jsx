@@ -77,7 +77,7 @@ export default function Becados() {
   ];
 
   const beneficios = [
-    '🎯 Acceso gratuito a cursos básicos',
+    '💸❌ Acceso gratuito a cursos básicos',
     '💰 50% de descuento en cursos premium',
     '📜 Certificados oficiales sin costo adicional',
     '👥 Acceso a comunidad exclusiva de becados',
