@@ -36,6 +36,7 @@ export default function Login() {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <h2 className="text-4xl font-bold text-gray-800 mb-2">Iniciar Sesión</h2>
+          
           <p className="text-gray-600">Accede a tu cuenta</p>
         </div>
 
@@ -91,6 +92,15 @@ export default function Login() {
             <Link to="/register" className="text-blue-500 font-semibold hover:text-blue-700">
               Regístrate aquí
             </Link>
+            <div className="mt-4 text-center">
+            <Link 
+            to="/forgot-password" 
+            className="text-sm text-blue-500 hover:text-blue-700 font-semibold"
+            >
+            ¿Olvidaste tu contraseña?
+            </Link>
+            </div>
+            
           </p>
         </div>
       </div>
