@@ -67,13 +67,13 @@ export default function Contacto() {
           </p>
           <div className="flex justify-center gap-4 flex-wrap">
             <span className="bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full text-sm">
-              📱 Respuesta Rápida
+              Respuesta Rápida
             </span>
             <span className="bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full text-sm">
-              💬 Atención Personalizada
+              Atención Personalizada
             </span>
             <span className="bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full text-sm">
-              🌟 Soporte 24/7
+              Soporte 24/7
             </span>
           </div>
         </div>
