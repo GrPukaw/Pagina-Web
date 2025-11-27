@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth');
+const { sendBecaAprobadaEmail } = require('../services/emailService');
 
 // Aplicar middlewares a todas las rutas de admin
 router.use(authMiddleware);
@@ -72,6 +73,15 @@ router.put('/becas/:userId/aprobar', async (req, res) => {
         success: false,
         message: 'Usuario no encontrado' 
       });
+    }
+
+    // Enviar email de aprobación
+    try {
+      await sendBecaAprobadaEmail(user.email, user.fullName);
+      console.log('✅ Email de aprobación enviado a:', user.email);
+    } catch (emailError) {
+      console.error('❌ Error al enviar email de aprobación:', emailError);
+      // No bloqueamos la aprobación si falla el email
     }
 
     res.json({

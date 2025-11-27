@@ -8,7 +8,7 @@ export default function Cursos() {
       description: 'Aprende HTML, CSS, JavaScript, React y Node.js',
       level: 'Intermedio',
       duration: '12 semanas',
-      price: 299,
+      price: 0,
       image: '💻'
     },
     {
@@ -17,8 +17,8 @@ export default function Cursos() {
       description: 'Domina Python, Pandas, NumPy y visualización de datos',
       level: 'Principiante',
       duration: '10 semanas',
-      price: 249,
-      image: '🐍'
+      price: 0,
+      image: '💻🐍'
     },
     {
       id: 3,
@@ -26,8 +26,8 @@ export default function Cursos() {
       description: 'Diseña experiencias de usuario increíbles con Figma',
       level: 'Principiante',
       duration: '8 semanas',
-      price: 199,
-      image: '🎨'
+      price: 0,
+      image: '🎨🖍️'
     },
     {
       id: 4,
@@ -35,7 +35,7 @@ export default function Cursos() {
       description: 'SEO, SEM, Redes Sociales y Analítica Web',
       level: 'Principiante',
       duration: '6 semanas',
-      price: 179,
+      price: 0,
       image: '📱'
     },
     {
@@ -44,7 +44,7 @@ export default function Cursos() {
       description: 'Mejora tu inglés profesional para el mundo laboral',
       level: 'Intermedio',
       duration: '16 semanas',
-      price: 349,
+      price: 0,
       image: '🌐'
     },
     {
@@ -53,7 +53,7 @@ export default function Cursos() {
       description: 'Metodologías ágiles, Scrum y gestión efectiva',
       level: 'Avanzado',
       duration: '8 semanas',
-      price: 229,
+      price: 0,
       image: '📊'
     }
   ];
