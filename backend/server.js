@@ -3,9 +3,8 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const connectDB = require('./config/database');
 require('dotenv').config();
-
 const app = express();
-
+const passport = require('./config/passport');
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

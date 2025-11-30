@@ -13,7 +13,7 @@ import ResetPassword from './pages/ResetPassword';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './pages/AdminDashboard';
 import CursoDetalle from './pages/CursoDetalle';
-
+import AuthSuccess from './pages/AuthSuccess';
 function App() {
   return (
     <AuthProvider>
@@ -30,6 +30,7 @@ function App() {
             <Route path="/cursos/:slug" element={<CursoDetalle />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route path="/auth/success" element={<AuthSuccess />} />
             
             {/* Solo admin*/}
             <Route 

@@ -17,7 +17,7 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="text-white text-2xl font-bold">
-              🌉 Plataforma Educativa
+              Plataforma Educativa
             </Link>
           </div>
 
@@ -26,7 +26,7 @@ export default function Navbar() {
               Inicio
             </Link>
             <Link to="/cursos" className="text-white hover:text-gray-200 transition">
-              Cursos
+              Cursos Gratuitos
             </Link>
             <Link to="/becados" className="text-white hover:text-gray-200 transition">
               Becados

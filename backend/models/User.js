@@ -41,7 +41,17 @@ const userSchema = new mongoose.Schema({
     },
     approvedAt: Date
   },
-  phone: String,
+  // OAuth fields - AGREGAR ESTO
+  googleId: String,
+  githubId: String,
+  facebookId: String,
+  authProvider: {
+    type: String,
+    enum: ['local', 'google', 'github', 'facebook'],
+    default: 'local'
+  },
+  // Fin OAuth fields
+    phone: String,
   createdAt: {
     type: Date,
     default: Date.now

@@ -4,7 +4,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const crypto = require('crypto');
+const passport = require('../config/passport');
 const { sendPasswordResetEmail, sendWelcomeEmail } = require('../services/emailService');
+
 
 router.post('/register', async (req, res) => {
   try {
@@ -303,5 +305,86 @@ router.post('/change-password', async (req, res) => {
     });
   }
 });
+// ============= RUTAS OAUTH =============// Google
+router.get('/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
 
+router.get('/google/callback',
+  passport.authenticate('google', { session: false, failureRedirect: `${process.env.FRONTEND_URL}/login?error=google` }),
+  (req, res) => {
+    // Crear token JWT
+    const token = jwt.sign(
+      { 
+        userId: req.user._id, 
+        email: req.user.email,
+        userType: req.user.userType 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // Redirigir al frontend con el token
+    res.redirect(`${process.env.FRONTEND_URL}/auth/success?token=${token}&user=${encodeURIComponent(JSON.stringify({
+      id: req.user._id,
+      fullName: req.user.fullName,
+      email: req.user.email,
+      userType: req.user.userType
+    }))}`);
+  }
+);
+
+// GitHub
+router.get('/github',
+  passport.authenticate('github', { scope: ['user:email'] })
+);
+
+router.get('/github/callback',
+  passport.authenticate('github', { session: false, failureRedirect: `${process.env.FRONTEND_URL}/login?error=github` }),
+  (req, res) => {
+    const token = jwt.sign(
+      { 
+        userId: req.user._id, 
+        email: req.user.email,
+        userType: req.user.userType 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.redirect(`${process.env.FRONTEND_URL}/auth/success?token=${token}&user=${encodeURIComponent(JSON.stringify({
+      id: req.user._id,
+      fullName: req.user.fullName,
+      email: req.user.email,
+      userType: req.user.userType
+    }))}`);
+  }
+);
+
+// Facebook
+router.get('/facebook',
+  passport.authenticate('facebook', { scope: ['email'] })
+);
+
+router.get('/facebook/callback',
+  passport.authenticate('facebook', { session: false, failureRedirect: `${process.env.FRONTEND_URL}/login?error=facebook` }),
+  (req, res) => {
+    const token = jwt.sign(
+      { 
+        userId: req.user._id, 
+        email: req.user.email,
+        userType: req.user.userType 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.redirect(`${process.env.FRONTEND_URL}/auth/success?token=${token}&user=${encodeURIComponent(JSON.stringify({
+      id: req.user._id,
+      fullName: req.user.fullName,
+      email: req.user.email,
+      userType: req.user.userType
+    }))}`);
+  }
+);
 module.exports = router;
