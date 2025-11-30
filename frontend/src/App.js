@@ -12,6 +12,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';   
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './pages/AdminDashboard';
+import CursoDetalle from './pages/CursoDetalle';
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
             <Route path="/cursos" element={<Cursos />} />
             <Route path="/becados" element={<Becados />} />
             <Route path="/contacto" element={<Contacto />} />
-            
+            <Route path="/cursos/:slug" element={<CursoDetalle />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             
