@@ -1,144 +1,170 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 export default function Cursos() {
-  const cursos = [
-    {
-      id: 1,
-      title: 'Desarrollo Web Full Stack',
-      description: 'Aprende HTML, CSS, JavaScript, React y Node.js',
-      level: 'Intermedio',
-      duration: '12 semanas',
-      price: 0,
-      image: '💻'
-    },
-    {
-      id: 2,
-      title: 'Python para Data Science',
-      description: 'Domina Python, Pandas, NumPy y visualización de datos',
-      level: 'Principiante',
-      duration: '10 semanas',
-      price: 0,
-      image: '💻🐍'
-    },
-    {
-      id: 3,
-      title: 'Diseño UX/UI',
-      description: 'Diseña experiencias de usuario increíbles con Figma',
-      level: 'Principiante',
-      duration: '8 semanas',
-      price: 0,
-      image: '🎨🖍️'
-    },
-    {
-      id: 4,
-      title: 'Marketing Digital',
-      description: 'SEO, SEM, Redes Sociales y Analítica Web',
-      level: 'Principiante',
-      duration: '6 semanas',
-      price: 0,
-      image: '📱'
-    },
-    {
-      id: 5,
-      title: 'Inglés de Negocios',
-      description: 'Mejora tu inglés profesional para el mundo laboral',
-      level: 'Intermedio',
-      duration: '16 semanas',
-      price: 0,
-      image: '🌐'
-    },
-    {
-      id: 6,
-      title: 'Gestión de Proyectos',
-      description: 'Metodologías ágiles, Scrum y gestión efectiva',
-      level: 'Avanzado',
-      duration: '8 semanas',
-      price: 0,
-      image: '📊'
+  const [cursos, setCursos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    fetchCursos();
+  }, []);
+
+  const fetchCursos = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('http://localhost:5000/api/cursos');
+      setCursos(response.data.cursos);
+    } catch (error) {
+      console.error('Error al cargar cursos:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const cursosFiltrados = cursos.filter(curso =>
+    curso.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    curso.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12 px-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-gray-800 mb-4">
-            Catálogo de Cursos
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <h1 className="text-5xl font-bold mb-4">
+            🎓 Cursos Gratuitos de Programación
           </h1>
-          <p className="text-xl text-gray-600">
-            Descubre nuestra oferta educativa y comienza a aprender hoy
+          <p className="text-xl text-blue-100 mb-8">
+            Aprende a programar desde cero con nuestros cursos completos y gratuitos
           </p>
-        </div>
-
-        {/* Filtros */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <div className="flex flex-wrap gap-4">
+          
+          {/* Buscador */}
+          <div className="max-w-2xl mx-auto">
             <input
               type="text"
-              placeholder="🔍 Buscar curso..."
-              className="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="🔍 Buscar curso por nombre o tecnología..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-6 py-4 rounded-lg text-gray-800 text-lg focus:ring-4 focus:ring-blue-300 outline-none shadow-lg"
             />
-            <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-              <option value="">Todos los niveles</option>
-              <option value="principiante">Principiante</option>
-              <option value="intermedio">Intermedio</option>
-              <option value="avanzado">Avanzado</option>
-            </select>
-            <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-              <option value="">Todas las categorías</option>
-              <option value="programacion">Programación</option>
-              <option value="diseno">Diseño</option>
-              <option value="negocios">Negocios</option>
-              <option value="idiomas">Idiomas</option>
-            </select>
           </div>
         </div>
+      </div>
 
-        {/* Grid de Cursos */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {cursos.map((curso) => (
-            <div key={curso.id} className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition">
-              <div className="bg-gradient-to-br from-blue-500 to-purple-500 p-12 flex items-center justify-center">
-                <span className="text-8xl">{curso.image}</span>
-              </div>
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full font-semibold">
-                    {curso.level}
-                  </span>
-                  <span className="text-gray-500 text-sm">⏱️ {curso.duration}</span>
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">{curso.title}</h3>
-                <p className="text-gray-600 text-sm mb-4">{curso.description}</p>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-3xl font-bold text-gray-800">${curso.price}</span>
-                    <p className="text-xs text-gray-500">Acceso de por vida</p>
-                  </div>
-                  <button className="bg-blue-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-600 transition">
-                    Ver más
-                  </button>
-                </div>
-                <div className="mt-4 pt-4 border-t flex items-center justify-between text-sm text-gray-500">
-                  <span>⭐ 4.8 (234 reviews)</span>
-                  <span>👥 1,250 estudiantes</span>
-                </div>
-              </div>
+      {/* Contenido */}
+      <div className="max-w-6xl mx-auto px-4 py-12">
+        {loading ? (
+          <div className="text-center py-20">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p className="mt-4 text-gray-600">Cargando cursos...</p>
+          </div>
+        ) : cursosFiltrados.length === 0 ? (
+          <div className="text-center py-20">
+            <div className="text-6xl mb-4">📭</div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">
+              No se encontraron cursos
+            </h3>
+            <p className="text-gray-600">
+              Intenta con otra búsqueda
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-gray-800">
+                📚 {cursosFiltrados.length} {cursosFiltrados.length === 1 ? 'Curso Disponible' : 'Cursos Disponibles'}
+              </h2>
+              <p className="text-gray-600 mt-2">
+                Todos los cursos son completamente gratuitos y sin restricciones
+              </p>
             </div>
-          ))}
-        </div>
 
-        {/* Info Becados */}
-        <div className="mt-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-2xl shadow-xl p-8 text-white text-center">
+            {/* Grid de Cursos */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {cursosFiltrados.map((curso) => (
+                <Link
+                  key={curso._id}
+                  to={`/cursos/${curso.slug}`}
+                  className="group bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:border-blue-500 hover:shadow-2xl transition-all duration-300"
+                >
+                  {/* Imagen del Curso */}
+                  <div className="relative h-48 overflow-hidden bg-gradient-to-br from-blue-500 to-purple-500">
+                    <img
+                      src={curso.image}
+                      alt={curso.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      onError={(e) => {
+                        // Si la imagen no carga, mostrar un gradiente con emoji
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                    {/* Fallback si no hay imagen */}
+                    <div className="absolute inset-0 flex items-center justify-center text-7xl bg-gradient-to-br from-blue-500 to-purple-500">
+                      {curso.image.includes('emoji') ? curso.image : '💻'}
+                    </div>
+                  </div>
+                  
+                  {/* Contenido */}
+                  <div className="p-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full font-bold">
+                        ✓ GRATIS
+                      </span>
+                      <span className="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full font-semibold">
+                        {curso.level}
+                      </span>
+                    </div>
+                    
+                    <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
+                      {curso.title}
+                    </h3>
+                    
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                      {curso.description}
+                    </p>
+                    
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                      <span className="flex items-center gap-1">
+                        <span>📺</span> {curso.secciones?.length || 0} secciones
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span>👥</span> {curso.students.toLocaleString()}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between pt-4 border-t">
+                      <span className="text-sm text-gray-500">
+                        ⭐ {curso.rating} ({curso.reviews})
+                      </span>
+                      <span className="text-blue-600 font-semibold group-hover:translate-x-2 transition-transform flex items-center gap-1">
+                        Ver curso <span>→</span>
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Banner Becas */}
+      <div className="bg-gradient-to-r from-green-500 to-teal-500 py-16 mt-12">
+        <div className="max-w-4xl mx-auto px-4 text-center text-white">
           <h2 className="text-3xl font-bold mb-4">
-            ¿Eres estudiante universitario?
+            🎓 ¿Eres estudiante universitario?
           </h2>
           <p className="text-lg mb-6 text-green-100">
-            Solicita una beca y accede a estos cursos con descuentos de hasta 50% o completamente gratis
+            Obtén certificados oficiales y acceso a contenido premium exclusivo
           </p>
-          <button className="bg-white text-green-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
-            Solicitar Beca Ahora
-          </button>
+          <Link
+            to="/register"
+            className="bg-white text-green-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition inline-block text-lg shadow-lg"
+          >
+            Solicitar Beca →
+          </Link>
         </div>
       </div>
     </div>

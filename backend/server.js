@@ -24,6 +24,10 @@ app.use('/api/becados', becadosRoutes);
 const adminRoutes = require('./routes/admin');
 app.use('/api/admin', adminRoutes);
 
+// Rutas de cursos
+const cursosRoutes = require('./routes/cursos');
+app.use('/api/cursos', cursosRoutes);
+
 app.get('/', (req, res) => {
   res.json({ 
     message: '🎓 API Plataforma Educativa',
