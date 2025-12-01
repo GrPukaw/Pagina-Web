@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 
 export const AuthContext = createContext();
 
@@ -16,21 +16,23 @@ export const AuthProvider = ({ children }) => {
       setUser(JSON.parse(storedUser));
     }
     setLoading(false);
-  }, []);
+  }, []); // ✅ Solo se ejecuta UNA VEZ al montar
 
-  const login = (userData, userToken) => {
+  // ✅ useCallback previene que la función cambie en cada render
+  const login = useCallback((userData, userToken) => {
     setUser(userData);
     setToken(userToken);
     localStorage.setItem('token', userToken);
     localStorage.setItem('user', JSON.stringify(userData));
-  };
+  }, []); // ✅ Sin dependencias, la función NUNCA cambia
 
-  const logout = () => {
+  // ✅ useCallback para logout también
+  const logout = useCallback(() => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-  };
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout, loading }}>
