@@ -14,6 +14,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './pages/AdminDashboard';
 import CursoDetalle from './pages/CursoDetalle';
 import AuthSuccess from './pages/AuthSuccess';
+import ChatWidget from './components/Chatbot/ChatWidget';
+
 function App() {
   return (
     <AuthProvider>
@@ -32,7 +34,7 @@ function App() {
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/auth/success" element={<AuthSuccess />} />
             
-            {/* Solo admin*/}
+            {/* Solo admin */}
             <Route 
               path="/admin" 
               element={
@@ -42,6 +44,9 @@ function App() {
               } 
             />
           </Routes>
+
+          {/* Chatbot - Aparece en todas las páginas */}
+          <ChatWidget />
         </div>
       </Router>
     </AuthProvider>
