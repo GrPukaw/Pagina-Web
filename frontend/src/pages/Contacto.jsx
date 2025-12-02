@@ -44,11 +44,11 @@ export default function Contacto() {
     },
     {
       name: 'Discord',
-      icon: '/images/contact/email.png',
-      url: 'mailto:https://discord.gg/yUDCGQRd',
-      color: 'from-red-500 to-red-600',
-      description: 'Unete a nuestra comunidad en Discord',
-      emoji: '✉️'
+      icon: '/images/contact/discord.png',
+      url: 'https://discord.gg/yUDCGQRd',
+      color: 'from-indigo-600 to-purple-700',
+      description: 'Únete a nuestra comunidad en Discord',
+      emoji: '🎮'
     }
   ];
 
@@ -95,32 +95,33 @@ export default function Contacto() {
               className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden group text-left"
             >
               {/* Header con imagen GRANDE de fondo */}
-              <div className="relative h-48 md:h-56 overflow-hidden">
-                {/* Imagen de fondo con gradiente */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${social.color}`}></div>
+              <div className="relative h-64 md:h-72 overflow-hidden">
+                {/* Imagen de fondo con gradiente más vibrante */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${social.color} opacity-90`}></div>
                 
-                {/* Patrón decorativo */}
-                <div className="absolute inset-0 opacity-20">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full filter blur-2xl"></div>
-                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full filter blur-xl"></div>
+                {/* Patrón decorativo mejorado */}
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-white rounded-full filter blur-3xl"></div>
+                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-white rounded-full filter blur-2xl"></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-white rounded-full filter blur-3xl"></div>
                 </div>
 
-                {/* Ícono centrado */}
-                <div className="absolute inset-0 flex items-center justify-center">
+                {/* Ícono centrado MUCHO MÁS GRANDE */}
+                <div className="absolute inset-0 flex items-center justify-center p-8">
                   <img 
                     src={social.icon} 
                     alt={social.name}
-                    className="w-24 h-24 md:w-32 md:h-32 object-contain filter drop-shadow-2xl relative z-10 group-hover:scale-110 transition-transform duration-300"
+                    className="w-40 h-40 md:w-48 md:h-48 object-contain filter drop-shadow-2xl relative z-10 group-hover:scale-105 transition-transform duration-300"
                     onError={(e) => {
                       // Fallback a emoji si la imagen no carga
                       e.target.style.display = 'none';
-                      e.target.parentElement.innerHTML = `<span class="text-7xl md:text-8xl relative z-10 group-hover:scale-110 transition-transform duration-300">${social.emoji}</span>`;
+                      e.target.parentElement.innerHTML = `<span class="text-8xl md:text-9xl relative z-10 group-hover:scale-105 transition-transform duration-300">${social.emoji}</span>`;
                     }}
                   />
                 </div>
 
-                {/* Overlay hover */}
-                <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                {/* Overlay hover con efecto de brillo */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
               
               {/* Contenido */}

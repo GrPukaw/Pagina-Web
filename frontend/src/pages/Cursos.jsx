@@ -34,7 +34,7 @@ export default function Cursos() {
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12 md:py-16 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4">
-            🎓 Cursos Gratuitos de Programación
+            Cursos Gratuitos de Programación
           </h1>
           <p className="text-base md:text-xl text-blue-100 mb-6 md:mb-8 px-4">
             Aprende a programar desde cero con nuestros cursos completos y gratuitos

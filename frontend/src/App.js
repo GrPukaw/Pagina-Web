@@ -14,7 +14,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './pages/AdminDashboard';
 import CursoDetalle from './pages/CursoDetalle';
 import AuthSuccess from './pages/AuthSuccess';
+import Certificado from './pages/Certificado'; 
 import ChatWidget from './components/Chatbot/ChatWidget';
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -34,6 +36,17 @@ function App() {
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/auth/success" element={<AuthSuccess />} />
             
+            
+            {/* NUEVA RUTA - Certificado (requiere login) */}
+            <Route 
+              path="/certificado/:slug" 
+              element={
+                <ProtectedRoute>
+                  <Certificado />
+                </ProtectedRoute>
+              } 
+            />
+            
             {/* Solo admin */}
             <Route 
               path="/admin" 
@@ -44,6 +57,9 @@ function App() {
               } 
             />
           </Routes>
+
+          {/* Footer - Aparece en todas las páginas */}
+          <Footer />
 
           {/* Chatbot - Aparece en todas las páginas */}
           <ChatWidget />

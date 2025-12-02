@@ -23,7 +23,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="text-white text-xl md:text-2xl font-bold flex-shrink-0" onClick={closeMenu}>
-            🎓 PuenteX
+            Plataforma educativa PuenteX
           </Link>
 
           {/* Desktop Menu */}

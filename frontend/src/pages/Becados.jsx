@@ -208,7 +208,7 @@ export default function Becados() {
         <section className="py-12 md:py-16 px-4">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-4">
-              🌟 Nuestros Becados
+              Nuestros Becados
             </h2>
             <p className="text-center text-gray-600 mb-8 md:mb-12 text-sm md:text-base">
               Conoce a los estudiantes que ya forman parte de nuestro programa
@@ -260,7 +260,7 @@ export default function Becados() {
                       
                       <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-100">
                         <span className="flex items-center gap-1 font-semibold text-green-600">
-                          <span>✅</span> Aprobado
+                          <span></span> Aprobado
                         </span>
                         <span>
                           {new Date(becado.createdAt).toLocaleDateString('es-PE')}

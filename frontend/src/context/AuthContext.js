@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 
 export const AuthContext = createContext();
 
@@ -7,31 +8,46 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Verificar token al cargar la app
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
-  }, []); // ✅ Solo se ejecuta UNA VEZ al montar
+    const verificarAutenticacion = async () => {
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
+      
+      if (storedToken && storedUser) {
+        try {
+          // Verificar que el token sea válido
+          axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+          const userData = JSON.parse(storedUser);
+          
+          setToken(storedToken);
+          setUser(userData);
+        } catch (error) {
+          console.error('Token inválido:', error);
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
+      }
+      setLoading(false);
+    };
 
-  // ✅ useCallback previene que la función cambie en cada render
+    verificarAutenticacion();
+  }, []);
+
   const login = useCallback((userData, userToken) => {
     setUser(userData);
     setToken(userToken);
     localStorage.setItem('token', userToken);
     localStorage.setItem('user', JSON.stringify(userData));
-  }, []); // ✅ Sin dependencias, la función NUNCA cambia
+    axios.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
+  }, []);
 
-  // ✅ useCallback para logout también
   const logout = useCallback(() => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    delete axios.defaults.headers.common['Authorization'];
   }, []);
 
   return (

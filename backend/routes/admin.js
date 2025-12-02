@@ -78,9 +78,9 @@ router.put('/becas/:userId/aprobar', async (req, res) => {
     // Enviar email de aprobación
     try {
       await sendBecaAprobadaEmail(user.email, user.fullName);
-      console.log('✅ Email de aprobación enviado a:', user.email);
+      console.log(' Email de aprobación enviado a:', user.email);
     } catch (emailError) {
-      console.error('❌ Error al enviar email de aprobación:', emailError);
+      console.error(' Error al enviar email de aprobación:', emailError);
       // No bloqueamos la aprobación si falla el email
     }
 

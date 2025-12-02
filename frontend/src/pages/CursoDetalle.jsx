@@ -10,7 +10,6 @@ export default function CursoDetalle() {
   const [curso, setCurso] = useState(null);
   const [seccionActual, setSeccionActual] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [progresoTotal, setProgresoTotal] = useState(0);
 
   useEffect(() => {
     fetchCurso();
@@ -27,8 +26,6 @@ export default function CursoDetalle() {
       setLoading(true);
       const response = await axios.get(`http://localhost:5000/api/cursos/${slug}`);
       setCurso(response.data.curso);
-      // Simular progreso (en producción vendría del backend)
-      setProgresoTotal(0);
     } catch (error) {
       console.error('Error al cargar curso:', error);
     } finally {
@@ -39,17 +36,6 @@ export default function CursoDetalle() {
   const cambiarSeccion = (seccion) => {
     setSeccionActual(seccion);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleGenerarCertificado = () => {
-    if (!user) {
-      alert('⚠️ Debes iniciar sesión para generar tu certificado');
-      navigate('/login');
-      return;
-    }
-    
-    // Redirigir a la página de certificado
-    navigate(`/certificado/${slug}`);
   };
 
   if (loading) {
@@ -74,7 +60,7 @@ export default function CursoDetalle() {
             onClick={() => navigate('/cursos')}
             className="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition w-full md:w-auto"
           >
-            ← Volver a cursos
+            Volver a cursos
           </button>
         </div>
       </div>
@@ -83,7 +69,7 @@ export default function CursoDetalle() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumb - Responsive */}
+      {/* Breadcrumb */}
       <div className="bg-white border-b sticky top-0 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center text-xs md:text-sm text-gray-600 overflow-x-auto">
@@ -98,7 +84,7 @@ export default function CursoDetalle() {
 
       <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
         <div className="grid lg:grid-cols-3 gap-4 md:gap-6">
-          {/* Columna Principal - Responsive */}
+          {/* Columna Principal */}
           <div className="lg:col-span-2 space-y-4 md:space-y-6">
             {/* Video */}
             {seccionActual && (
@@ -132,7 +118,7 @@ export default function CursoDetalle() {
 
                 {seccionActual.temario && seccionActual.temario.length > 0 && (
                   <div className="mt-4 md:mt-6">
-                    <h3 className="text-base md:text-lg font-bold text-gray-800 mb-3 md:mb-4">📋 Contenido de esta sección:</h3>
+                    <h3 className="text-base md:text-lg font-bold text-gray-800 mb-3 md:mb-4">Contenido de esta sección:</h3>
                     <ul className="space-y-2">
                       {seccionActual.temario.map((item, idx) => (
                         <li key={idx} className="flex items-start gap-2 md:gap-3">
@@ -146,30 +132,30 @@ export default function CursoDetalle() {
               </div>
             )}
 
-            {/* Botón de Certificado - NUEVO */}
+            {/* BOTÓN DE CERTIFICADO - NUEVO */}
             {user && (
               <div className="bg-gradient-to-r from-green-500 to-teal-500 rounded-xl shadow-lg p-4 md:p-6 text-white">
                 <div className="flex flex-col md:flex-row items-center gap-4">
                   <div className="flex-1 text-center md:text-left">
-                    <h3 className="text-lg md:text-xl font-bold mb-2">🎓 ¡Genera tu Certificado!</h3>
+                    <h3 className="text-lg md:text-xl font-bold mb-2">¡Genera tu Certificado!</h3>
                     <p className="text-xs md:text-sm text-green-100">
                       Completa el curso y obtén tu certificado oficial en formato PDF
                     </p>
                   </div>
                   <button
-                    onClick={handleGenerarCertificado}
+                    onClick={() => navigate(`/certificado/${slug}`)}
                     className="bg-white text-green-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition shadow-lg transform hover:scale-105 whitespace-nowrap w-full md:w-auto"
                   >
-                    📜 Obtener Certificado
+                    Obtener Certificado
                   </button>
                 </div>
               </div>
             )}
 
-            {/* Descripción del curso - Responsive */}
+            {/* Descripción del curso */}
             <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
               <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">
-                📖 Acerca de este curso
+                Acerca de este curso
               </h2>
               <p className="text-sm md:text-base lg:text-lg text-gray-700 leading-relaxed mb-4 md:mb-6">
                 {curso.description}
@@ -177,29 +163,29 @@ export default function CursoDetalle() {
 
               <div className="grid sm:grid-cols-2 gap-3 md:gap-4 pt-4 md:pt-6 border-t">
                 <div>
-                  <h3 className="font-bold text-gray-800 mb-2 text-sm md:text-base">👨‍🏫 Instructor</h3>
+                  <h3 className="font-bold text-gray-800 mb-2 text-sm md:text-base">Instructor</h3>
                   <p className="text-xs md:text-sm text-gray-600">{curso.instructor?.name || 'Instructor'}</p>
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-800 mb-2 text-sm md:text-base">📊 Nivel</h3>
+                  <h3 className="font-bold text-gray-800 mb-2 text-sm md:text-base">Nivel</h3>
                   <p className="text-xs md:text-sm text-gray-600">{curso.level}</p>
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-800 mb-2 text-sm md:text-base">⏱️ Duración</h3>
+                  <h3 className="font-bold text-gray-800 mb-2 text-sm md:text-base">Duración</h3>
                   <p className="text-xs md:text-sm text-gray-600">{curso.duration}</p>
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-800 mb-2 text-sm md:text-base">👥 Estudiantes</h3>
+                  <h3 className="font-bold text-gray-800 mb-2 text-sm md:text-base">Estudiantes</h3>
                   <p className="text-xs md:text-sm text-gray-600">{curso.students.toLocaleString()}</p>
                 </div>
               </div>
             </div>
 
-            {/* Lo que aprenderás - Responsive */}
+            {/* Lo que aprenderás */}
             {curso.whatYouWillLearn && curso.whatYouWillLearn.length > 0 && (
               <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
                 <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6">
-                  🎯 Lo que aprenderás en este curso
+                  Lo que aprenderás en este curso
                 </h2>
                 <div className="grid sm:grid-cols-2 gap-3 md:gap-4">
                   {curso.whatYouWillLearn.map((item, index) => (
@@ -212,11 +198,11 @@ export default function CursoDetalle() {
               </div>
             )}
 
-            {/* Requisitos - Responsive */}
+            {/* Requisitos */}
             {curso.requirements && curso.requirements.length > 0 && (
               <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
                 <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6">
-                  📋 Requisitos
+                  Requisitos
                 </h2>
                 <ul className="space-y-2 md:space-y-3">
                   {curso.requirements.map((req, index) => (
@@ -230,11 +216,11 @@ export default function CursoDetalle() {
             )}
           </div>
 
-          {/* Sidebar - Temario - Responsive */}
+          {/* Sidebar - Temario */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-lg sticky top-20">
               <div className="p-4 md:p-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-xl">
-                <h3 className="text-lg md:text-xl font-bold">📚 Temario del Curso</h3>
+                <h3 className="text-lg md:text-xl font-bold">Temario del Curso</h3>
                 <p className="text-xs md:text-sm text-blue-100 mt-1">
                   {curso.secciones?.length || 0} secciones disponibles
                 </p>
@@ -294,28 +280,11 @@ export default function CursoDetalle() {
                   to="/cursos"
                   className="block text-center bg-gray-200 text-gray-700 py-2 rounded-lg font-semibold hover:bg-gray-300 transition text-sm md:text-base"
                 >
-                  ← Volver a cursos
+                  Volver a cursos
                 </Link>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Banner Becas - Responsive */}
-      <div className="mt-8 md:mt-12 bg-green-50 border-t-4 border-green-500 py-6 md:py-8">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <p className="text-sm md:text-base text-gray-700 mb-3">
-            <span className="font-bold text-base md:text-lg">¿Eres estudiante universitario?</span>
-            <br />
-            Obtén certificados oficiales y acceso a contenido premium
-          </p>
-          <Link
-            to="/becados"
-            className="inline-block text-green-600 font-bold hover:text-green-700 underline text-base md:text-lg"
-          >
-            Conoce nuestro programa de becas →
-          </Link>
         </div>
       </div>
     </div>
