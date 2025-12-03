@@ -13,7 +13,7 @@ const [error, setError] = useState('');
 const [success, setSuccess] = useState(false);
 const [tokenValid, setTokenValid] = useState(false);
 
-// ✅ CORRECCIÓN: useCallback para validateToken
+// useCallback para validateToken
 const validateToken = useCallback(async () => {
     try {
     await axios.get(`http://localhost:5000/api/auth/reset-password/${token}`);
@@ -26,7 +26,7 @@ const validateToken = useCallback(async () => {
     }
 }, [token]);
 
-// ✅ CORRECCIÓN: Incluir validateToken en las dependencias
+// Incluir validateToken en las dependencias
 useEffect(() => {
     validateToken();
 }, [validateToken]);

@@ -24,11 +24,11 @@ useEffect(() => {
     scrollToBottom();
 }, [messages, isTyping]);
 
-  // Función para buscar respuesta en FAQs
+  // busca la respuesta
 const buscarRespuesta = (preguntaUsuario) => {
     const preguntaLower = preguntaUsuario.toLowerCase();
     
-    // Buscar coincidencias exactas o parciales
+    // Buscar coincidencias
     const coincidencias = faqs.filter(faq => {
     const preguntaFaqLower = faq.pregunta.toLowerCase();
     const palabrasClave = preguntaFaqLower.split(' ');

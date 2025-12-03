@@ -1,9 +1,6 @@
-/* stylelint-disable at-rule-no-unknown */
-/* Tailwind CSS directives - processed by PostCSS/Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* stylelint-enable at-rule-no-unknown */
 
 * {
   margin: 0;
