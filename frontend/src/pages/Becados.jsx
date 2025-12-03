@@ -115,7 +115,7 @@ export default function Becados() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Hero Section con imagen de fondo */}
+      {/* Seccion Hero */}
       <section 
         className="relative bg-gradient-to-r from-green-600 to-teal-600 text-white py-12 md:py-20 px-4 overflow-hidden"
         style={{
@@ -137,7 +137,7 @@ export default function Becados() {
             Apoyamos tu crecimiento académico y profesional
           </p>
           
-          {/* Estadísticas - DISEÑO MEJORADO */}
+          {/* Mostrar estadisticas aqui */}
           {estadisticas && (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 max-w-5xl mx-auto mb-6 md:mb-8">
               {/* Total Solicitudes */}
@@ -203,7 +203,7 @@ export default function Becados() {
         </div>
       </section>
 
-      {/* Becados Aprobados - DISEÑO MEJORADO */}
+      {/* Becados Aprobados  */}
       {becados.length > 0 && (
         <section className="py-12 md:py-16 px-4">
           <div className="max-w-6xl mx-auto">
@@ -296,7 +296,7 @@ export default function Becados() {
         </section>
       )}
 
-      {/* Requisitos - CON IMÁGENES GRANDES */}
+      {/* Requisitos */}
       <section className="py-12 md:py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-4">
@@ -309,7 +309,7 @@ export default function Becados() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {requisitos.map((req, index) => (
               <div key={index} className="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-                {/* Imagen grande de fondo */}
+                {/* Imagen  */}
                 <div className="relative h-48 md:h-56 overflow-hidden">
                   <img 
                     src={req.image} 
@@ -338,7 +338,7 @@ export default function Becados() {
         </div>
       </section>
 
-      {/* Beneficios - CON IMÁGENES GRANDES */}
+      {/* Beneficios */}
       <section className="py-12 md:py-16 px-4 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-8 md:mb-12">

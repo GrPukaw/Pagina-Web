@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
@@ -13,10 +13,8 @@ const [error, setError] = useState('');
 const [success, setSuccess] = useState(false);
 const [tokenValid, setTokenValid] = useState(false);
 
-useEffect(() => {
-    validateToken();
-}, [token]);
-const validateToken = async () => {
+// ✅ CORRECCIÓN: useCallback para validateToken
+const validateToken = useCallback(async () => {
     try {
     await axios.get(`http://localhost:5000/api/auth/reset-password/${token}`);
     setTokenValid(true);
@@ -26,7 +24,12 @@ const validateToken = async () => {
     } finally {
     setValidating(false);
     }
-};
+}, [token]);
+
+// ✅ CORRECCIÓN: Incluir validateToken en las dependencias
+useEffect(() => {
+    validateToken();
+}, [validateToken]);
 
 const handleSubmit = async (e) => {
     e.preventDefault();

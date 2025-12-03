@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
@@ -20,17 +20,8 @@ const [fechaCompletado] = useState(new Date().toLocaleDateString('es-PE', {
     day: 'numeric'
 }));
 
-useEffect(() => {
-    if (!user) {
-    alert('Debes iniciar sesión para ver tu certificado');
-    navigate('/login');
-    return;
-    }
-    fetchCurso();
-    precargarImagenes();
-}, [slug, user, navigate]);
-
-const fetchCurso = async () => {
+// ✅ CORRECCIÓN: useCallback para fetchCurso
+const fetchCurso = useCallback(async () => {
     try {
     const response = await axios.get(`http://localhost:5000/api/cursos/${slug}`);
     setCurso(response.data.curso);
@@ -39,10 +30,10 @@ const fetchCurso = async () => {
     console.error('Error al cargar curso:', error);
     setLoading(false);
     }
-};
+}, [slug]);
 
-  // Precargar imágenes para que html2canvas las capture
-const precargarImagenes = () => {
+// ✅ CORRECCIÓN: useCallback para precargarImagenes
+const precargarImagenes = useCallback(() => {
     const imagenes = [
     '/images/certificados/logo-puentex.png',
     '/images/certificados/sello-oficial.png',
@@ -66,7 +57,18 @@ const precargarImagenes = () => {
     };
     img.src = src;
     });
-};
+}, []);
+
+// ✅ CORRECCIÓN: Incluir todas las dependencias
+useEffect(() => {
+    if (!user) {
+    alert('Debes iniciar sesión para ver tu certificado');
+    navigate('/login');
+    return;
+    }
+    fetchCurso();
+    precargarImagenes();
+}, [user, navigate, fetchCurso, precargarImagenes]);
 
 const generarPDF = async () => {
     setGenerando(true);

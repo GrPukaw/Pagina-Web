@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
@@ -11,17 +11,8 @@ export default function CursoDetalle() {
   const [seccionActual, setSeccionActual] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchCurso();
-  }, [slug]);
-
-  useEffect(() => {
-    if (curso && curso.secciones && curso.secciones.length > 0 && !seccionActual) {
-      setSeccionActual(curso.secciones[0]);
-    }
-  }, [curso]);
-
-  const fetchCurso = async () => {
+  // ✅ CORRECCIÓN: useCallback para fetchCurso
+  const fetchCurso = useCallback(async () => {
     try {
       setLoading(true);
       const response = await axios.get(`http://localhost:5000/api/cursos/${slug}`);
@@ -31,7 +22,19 @@ export default function CursoDetalle() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [slug]);
+
+  // ✅ CORRECCIÓN: Incluir fetchCurso en las dependencias
+  useEffect(() => {
+    fetchCurso();
+  }, [fetchCurso]);
+
+  // ✅ CORRECCIÓN: Incluir seccionActual en las dependencias
+  useEffect(() => {
+    if (curso && curso.secciones && curso.secciones.length > 0 && !seccionActual) {
+      setSeccionActual(curso.secciones[0]);
+    }
+  }, [curso, seccionActual]);
 
   const cambiarSeccion = (seccion) => {
     setSeccionActual(seccion);

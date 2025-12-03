@@ -41,8 +41,7 @@ const userSchema = new mongoose.Schema({
     },
     approvedAt: Date
   },
-  // OAuth fields - AGREGAR ESTO
-  googleId: String,
+    googleId: String,
   githubId: String,
   facebookId: String,
   authProvider: {
@@ -50,7 +49,7 @@ const userSchema = new mongoose.Schema({
     enum: ['local', 'google', 'github', 'facebook'],
     default: 'local'
   },
-  // Fin OAuth fields
+  
     phone: String,
   createdAt: {
     type: Date,

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function AdminDashboard() {
   const [becadosPendientes, setBecadosPendientes] = useState([]);
@@ -26,6 +27,7 @@ export default function AdminDashboard() {
       setLoading(false);
     } catch (error) {
       console.error('Error al cargar datos:', error);
+      toast.error('Error al cargar los datos');
       setLoading(false);
     }
   };
@@ -34,6 +36,10 @@ export default function AdminDashboard() {
     if (!window.confirm(`¿Aprobar la beca de ${fullName}?`)) return;
 
     setProcesando(userId);
+    
+    // Toast de carga
+    const loadingToast = toast.loading('Procesando aprobación...');
+    
     try {
       const token = localStorage.getItem('token');
       await axios.put(
@@ -42,11 +48,20 @@ export default function AdminDashboard() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert('✅ Beca aprobada exitosamente');
+      // Cerrar toast de carga y mostrar éxito
+      toast.dismiss(loadingToast);
+      toast.success(`✅ Beca de ${fullName} aprobada exitosamente`, {
+        duration: 4000,
+        icon: '🎉',
+      });
+      
       fetchData();
     } catch (error) {
       console.error('Error al aprobar:', error);
-      alert('❌ Error al aprobar la beca');
+      toast.dismiss(loadingToast);
+      toast.error('❌ Error al aprobar la beca. Intenta nuevamente', {
+        duration: 4000,
+      });
     } finally {
       setProcesando(null);
     }
@@ -57,6 +72,10 @@ export default function AdminDashboard() {
     if (!motivo) return;
 
     setProcesando(userId);
+    
+    // Toast de carga
+    const loadingToast = toast.loading('Procesando rechazo...');
+    
     try {
       const token = localStorage.getItem('token');
       await axios.put(
@@ -65,11 +84,20 @@ export default function AdminDashboard() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert('Beca rechazada');
+      // Cerrar toast de carga y mostrar info
+      toast.dismiss(loadingToast);
+      toast(`Beca de ${fullName} rechazada`, {
+        duration: 3000,
+        icon: 'ℹ️',
+      });
+      
       fetchData();
     } catch (error) {
       console.error('Error al rechazar:', error);
-      alert('Error al rechazar la beca');
+      toast.dismiss(loadingToast);
+      toast.error('❌ Error al rechazar la beca. Intenta nuevamente', {
+        duration: 4000,
+      });
     } finally {
       setProcesando(null);
     }
@@ -85,11 +113,53 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
+      {/* Toaster Component - Necesario para que funcionen las notificaciones */}
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        gutter={8}
+        toastOptions={{
+          // Estilos por defecto
+          duration: 3000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+            padding: '16px',
+            borderRadius: '8px',
+            fontSize: '14px',
+          },
+          // Estilos específicos por tipo
+          success: {
+            style: {
+              background: '#10b981',
+            },
+            iconTheme: {
+              primary: '#fff',
+              secondary: '#10b981',
+            },
+          },
+          error: {
+            style: {
+              background: '#ef4444',
+            },
+            iconTheme: {
+              primary: '#fff',
+              secondary: '#ef4444',
+            },
+          },
+          loading: {
+            style: {
+              background: '#3b82f6',
+            },
+          },
+        }}
+      />
+
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            👨‍💼 Panel de Administración
+            Panel de Administración
           </h1>
           <p className="text-gray-600">Gestiona becas y usuarios de la plataforma</p>
         </div>
@@ -120,19 +190,19 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-800">
-              ⏳ Solicitudes Pendientes ({becadosPendientes.length})
+              Solicitudes Pendientes ({becadosPendientes.length})
             </h2>
             <button
               onClick={fetchData}
               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
             >
-              🔄 Actualizar
+              Actualizar
             </button>
           </div>
 
           {becadosPendientes.length === 0 ? (
             <div className="text-center py-12">
-              <div className="text-6xl mb-4">✅</div>
+              <div className="text-6xl mb-4"></div>
               <p className="text-gray-600 text-lg">No hay solicitudes pendientes</p>
             </div>
           ) : (
