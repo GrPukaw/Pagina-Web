@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Usar variable de entorno o fallback
+// fallback
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const api = axios.create({
@@ -11,7 +11,7 @@ const api = axios.create({
   timeout: 10000, // 10 segundos timeout
 });
 
-// Interceptor para agregar token automáticamente
+// Agregar token automaticamente
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -25,7 +25,7 @@ api.interceptors.request.use(
   }
 );
 
-// Interceptor para manejar errores globalmente
+// Manejar errores
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -36,7 +36,7 @@ api.interceptors.response.use(
       window.location.href = '/login';
     }
     
-    // Si hay error de red
+    // Verificar error de red
     if (!error.response) {
       console.error('Error de red - servidor no disponible');
     }
