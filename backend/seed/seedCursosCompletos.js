@@ -846,7 +846,8 @@ const cursosCompletos = [
           'Implementar vistas básicas',
           'Agregar validaciones'
         ]
-      }
+      },
+      
     ]
   }
 ];
