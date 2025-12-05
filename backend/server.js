@@ -1,38 +1,66 @@
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose');
-const connectDB = require('./config/database');
-const helmet = require('helmet'); // INSTALAR: npm install helmet
-const mongoSanitize = require('express-mongo-sanitize'); // INSTALAR: npm install express-mongo-sanitize
-const rateLimit = require('express-rate-limit'); // INSTALAR: npm install express-rate-limit
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const rateLimit = require('express-rate-limit');
+
 
 require('dotenv').config();
 
-const app = express();
+
+const { validateEnv } = require('./config/validateEnv');
+validateEnv(); 
+
+const connectDB = require('./config/database');
+const logger = require('./config/logger'); 
 const passport = require('./config/passport');
+
+const app = express();
+
+// Log de todas las peticiones HTTP
+app.use((req, res, next) => {
+  const start = Date.now();
+  
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    logger.http(`${req.method} ${req.url} ${res.statusCode} - ${duration}ms`);
+  });
+  
+  next();
+});
 
 // ============== SEGURIDAD ====================
 
-// 1. Helmet - Protección de headers HTTP
+// Helmet: Protege headers HTTP
 app.use(helmet({
-  contentSecurityPolicy: false, // Ajustar según necesites
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
   crossOriginEmbedderPolicy: false
 }));
 
-// 2. CORS configurado correctamente
+// CORS Go loggin
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
   ? process.env.ALLOWED_ORIGINS.split(',')
   : ['http://localhost:3000'];
 
+logger.info(`CORS configurado para: ${allowedOrigins.join(', ')}`);
+
 app.use(cors({
   origin: function(origin, callback) {
-    // Permitir requests sin origin (como mobile apps o curl)
+    // Permitir requests sin origin (mobile apps, curl)
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'La política CORS no permite acceso desde este origen.';
-      return callback(new Error(msg), false);
+      logger.warn(`Petición CORS bloqueada desde: ${origin}`);
+      return callback(new Error('CORS no permitido'), false);
     }
+    
     return callback(null, true);
   },
   credentials: true,
@@ -40,39 +68,72 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// 3. Rate Limiting - Prevenir ataques de fuerza bruta
+// Rate Limiting con mensajes personalizados
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // límite de 100 requests por IP
-  message: 'Demasiadas solicitudes desde esta IP, intenta de nuevo más tarde.',
+  max: 100,
+  message: {
+    success: false,
+    message: 'Demasiadas solicitudes. Intenta de nuevo en 15 minutos.',
+  },
   standardHeaders: true,
   legacyHeaders: false,
+  // Callback cuando se alcanza el límite
+  handler: (req, res) => {
+    logger.warn(`Rate limit alcanzado para IP: ${req.ip}`);
+    res.status(429).json({
+      success: false,
+      message: 'Demasiadas solicitudes. Intenta de nuevo en 15 minutos.'
+    });
+  }
 });
 
+// Rate limiter más estricto para rutas de autenticación
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 5, // 5 intentos de login por IP
-  message: 'Demasiados intentos de login, intenta de nuevo en 15 minutos.',
-  skipSuccessfulRequests: true
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: {
+    success: false,
+    message: 'Demasiados intentos de login. Intenta en 15 minutos.',
+  },
+  skipSuccessfulRequests: true,
+  handler: (req, res) => {
+    logger.warn(`Login rate limit para IP: ${req.ip}`);
+    res.status(429).json({
+      success: false,
+      message: 'Demasiados intentos de login. Intenta en 15 minutos.'
+    });
+  }
 });
 
-// Aplicar limitadores
 app.use('/api/', limiter);
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 
-// 4. Sanitización contra NoSQL injection
+// Sanitización contra NoSQL injection
 app.use(mongoSanitize());
 
-// 5. Body parser
-app.use(express.json({ limit: '10mb' }));
+// Body parser con límites
+app.use(express.json({ 
+  limit: '10mb',
+  verify: (req, res, buf) => {
+    // Log de payloads grandes
+    if (buf.length > 1000000) { // > 1MB
+      logger.warn(`Payload grande detectado: ${buf.length} bytes desde ${req.ip}`);
+    }
+  }
+}));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// ============== CONEXIÓN A BASE DE DATOS ====================
-connectDB();
+// ============== BASE DE DATOS ====================
 
-// ============== RUTAS ====================
-const authRoutes = require('./routes/auth');
+// Conectar a MongoDB con manejo de errores
+connectDB().catch(err => {
+  logger.error('Error fatal al conectar a MongoDB:', err);
+  process.exit(1);
+});
+
+//Rutas
 const becadosRoutes = require('./routes/becados');
 const adminRoutes = require('./routes/admin');
 const cursosRoutes = require('./routes/cursos');
@@ -82,73 +143,133 @@ app.use('/api/becados', becadosRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/cursos', cursosRoutes);
 
-// ============== RUTA DE SALUD ====================
-app.get('/health', (req, res) => {
-  res.json({ 
+app.get('/health', async (req, res) => {
+  const mongoose = require('mongoose');
+  
+  const health = {
     status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
     environment: process.env.NODE_ENV,
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-    timestamp: new Date().toISOString()
-  });
-});
+    database: {
+      connected: mongoose.connection.readyState === 1,
+      name: mongoose.connection.name
+    },
+    memory: {
+      used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+      total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+      unit: 'MB'
+    }
+  };
 
-// ============== RUTA RAÍZ ====================
+  // Si la DB no está conectada, devolver error 503
+  if (!health.database.connected) {
+    health.status = 'unhealthy';
+    logger.error('Health check falló: Base de datos desconectada');
+    return res.status(503).json(health);
+  }
+
+  res.json(health);
+});
+//RUTA MADRE
+
 app.get('/', (req, res) => {
   res.json({ 
     message: 'API PuenteX',
-    version: '1.0.0',
+    version: '2.0.0', // Actualizado
     status: 'online',
-    environment: process.env.NODE_ENV
+    environment: process.env.NODE_ENV,
+    documentation: '/api/docs' // Para futuro
   });
 });
 
-// ============== MANEJO DE ERRORES ====================
-// Ruta no encontrada
+// Manejar errores
 app.use((req, res) => {
+  logger.warn(`Ruta no encontrada: ${req.method} ${req.url}`);
   res.status(404).json({ 
     success: false,
-    message: 'Ruta no encontrada' 
+    message: 'Ruta no encontrada',
+    path: req.url
   });
 });
 
-// Manejador de errores global
+// Manejador global de errores
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  
-  // No exponer detalles del error en producción
-  const message = process.env.NODE_ENV === 'production' 
-    ? 'Error interno del servidor'
-    : err.message;
+  // Log del error con contexto
+  logger.error('Error en la aplicación:', {
+    message: err.message,
+    stack: err.stack,
+    url: req.url,
+    method: req.method,
+    ip: req.ip
+  });
 
+  // En producción, no exponer detalles del error
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
   res.status(err.status || 500).json({
     success: false,
-    message: message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    message: isDevelopment ? err.message : 'Error interno del servidor',
+    ...(isDevelopment && { 
+      stack: err.stack,
+      details: err 
+    })
   });
 });
 
-// ============== INICIO DEL SERVIDOR ====================
+// Servidor corriendo
+
 const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
-  console.log('\n╔════════════════════════════════════════════╗');
-  console.log('║   🚀 SERVIDOR INICIADO EXITOSAMENTE       ║');
-  console.log('╠════════════════════════════════════════════╣');
-  console.log(`║   📍 Puerto: ${PORT}                           ║`);
-  console.log(`║   🌍 Entorno: ${process.env.NODE_ENV || 'development'}             ║`);
-  console.log('╚════════════════════════════════════════════╝\n');
+  logger.info('╔════════════════════════════════════════════╗');
+  logger.info('║   🚀 SERVIDOR INICIADO EXITOSAMENTE       ║');
+  logger.info('╠════════════════════════════════════════════╣');
+  logger.info(`║   📍 Puerto: ${PORT}                           ║`);
+  logger.info(`║   🌍 Entorno: ${process.env.NODE_ENV || 'development'}             ║`);
+  logger.info(`║   🔒 CORS: ${allowedOrigins.length} origen(es)        ║`);
+  logger.info('╚════════════════════════════════════════════╝');
 });
 
-// Manejo de shutdown graceful
-process.on('SIGTERM', () => {
-  console.log('SIGTERM recibido. Cerrando servidor...');
+// SHUTDOWN
+
+const gracefulShutdown = (signal) => {
+  logger.info(`\n${signal} recibido. Iniciando shutdown graceful...`);
+  
   server.close(() => {
-    console.log('Servidor cerrado');
+    logger.info('✅ Servidor HTTP cerrado');
+    
+    // Cerrar conexión a MongoDB
+    const mongoose = require('mongoose');
     mongoose.connection.close(false, () => {
-      console.log('Conexión MongoDB cerrada');
+      logger.info('✅ Conexión MongoDB cerrada');
+      logger.info('👋 Proceso terminado correctamente');
       process.exit(0);
     });
   });
+
+  // Forzar cierre después de 30 segundos
+  setTimeout(() => {
+    logger.error('⚠️  Shutdown forzado después de 30s');
+    process.exit(1);
+  }, 30000);
+};
+
+// Escuchar señales de terminación
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Capturar errores no manejados
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Promesa rechazada no manejada:', {
+    reason,
+    promise
+  });
+});
+
+process.on('uncaughtException', (error) => {
+  logger.error('Excepción no capturada:', error);
+  gracefulShutdown('uncaughtException');
 });
 
 module.exports = app;
