@@ -4,9 +4,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const rateLimit = require('express-rate-limit');
 
-
 require('dotenv').config();
-
 
 const { validateEnv } = require('./config/validateEnv');
 validateEnv(); 
@@ -44,7 +42,7 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false
 }));
 
-// CORS Go loggin
+// CORS
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
   ? process.env.ALLOWED_ORIGINS.split(',')
   : ['http://localhost:3000'];
@@ -53,7 +51,6 @@ logger.info(`CORS configurado para: ${allowedOrigins.join(', ')}`);
 
 app.use(cors({
   origin: function(origin, callback) {
-    // Permitir requests sin origin (mobile apps, curl)
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.indexOf(origin) === -1) {
@@ -68,9 +65,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Rate Limiting con mensajes personalizados
+// Rate Limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
+  windowMs: 15 * 60 * 1000,
   max: 100,
   message: {
     success: false,
@@ -78,7 +75,6 @@ const limiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  // Callback cuando se alcanza el límite
   handler: (req, res) => {
     logger.warn(`Rate limit alcanzado para IP: ${req.ip}`);
     res.status(429).json({
@@ -88,7 +84,6 @@ const limiter = rateLimit({
   }
 });
 
-// Rate limiter más estricto para rutas de autenticación
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
@@ -110,30 +105,23 @@ app.use('/api/', limiter);
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 
-// Sanitización contra NoSQL injection
+// Sanitización
 app.use(mongoSanitize());
 
-// Body parser con límites
-app.use(express.json({ 
-  limit: '10mb',
-  verify: (req, res, buf) => {
-    // Log de payloads grandes
-    if (buf.length > 1000000) { // > 1MB
-      logger.warn(`Payload grande detectado: ${buf.length} bytes desde ${req.ip}`);
-    }
-  }
-}));
+// Body parser (sin verify que causa problemas)
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ============== BASE DE DATOS ====================
 
-// Conectar a MongoDB con manejo de errores
 connectDB().catch(err => {
   logger.error('Error fatal al conectar a MongoDB:', err);
   process.exit(1);
 });
 
-//Rutas
+// ============== RUTAS ====================
+// ⚠️ ESTO ES LO QUE FALTABA - IMPORTAR authRoutes
+const authRoutes = require('./routes/auth');
 const becadosRoutes = require('./routes/becados');
 const adminRoutes = require('./routes/admin');
 const cursosRoutes = require('./routes/cursos');
@@ -143,6 +131,7 @@ app.use('/api/becados', becadosRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/cursos', cursosRoutes);
 
+// Health check
 app.get('/health', async (req, res) => {
   const mongoose = require('mongoose');
   
@@ -162,7 +151,6 @@ app.get('/health', async (req, res) => {
     }
   };
 
-  // Si la DB no está conectada, devolver error 503
   if (!health.database.connected) {
     health.status = 'unhealthy';
     logger.error('Health check falló: Base de datos desconectada');
@@ -171,19 +159,19 @@ app.get('/health', async (req, res) => {
 
   res.json(health);
 });
-//RUTA MADRE
 
+// Ruta raíz
 app.get('/', (req, res) => {
   res.json({ 
     message: 'API PuenteX',
-    version: '2.0.0', // Actualizado
+    version: '2.0.0',
     status: 'online',
     environment: process.env.NODE_ENV,
-    documentation: '/api/docs' // Para futuro
+    documentation: '/api/docs'
   });
 });
 
-// Manejar errores
+// Manejar 404
 app.use((req, res) => {
   logger.warn(`Ruta no encontrada: ${req.method} ${req.url}`);
   res.status(404).json({ 
@@ -195,7 +183,6 @@ app.use((req, res) => {
 
 // Manejador global de errores
 app.use((err, req, res, next) => {
-  // Log del error con contexto
   logger.error('Error en la aplicación:', {
     message: err.message,
     stack: err.stack,
@@ -204,7 +191,6 @@ app.use((err, req, res, next) => {
     ip: req.ip
   });
 
-  // En producción, no exponer detalles del error
   const isDevelopment = process.env.NODE_ENV === 'development';
   
   res.status(err.status || 500).json({
@@ -217,8 +203,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Servidor corriendo
-
+// Servidor
 const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
@@ -231,15 +216,13 @@ const server = app.listen(PORT, () => {
   logger.info('╚════════════════════════════════════════════╝');
 });
 
-// SHUTDOWN
-
+// Graceful shutdown
 const gracefulShutdown = (signal) => {
   logger.info(`\n${signal} recibido. Iniciando shutdown graceful...`);
   
   server.close(() => {
     logger.info('✅ Servidor HTTP cerrado');
     
-    // Cerrar conexión a MongoDB
     const mongoose = require('mongoose');
     mongoose.connection.close(false, () => {
       logger.info('✅ Conexión MongoDB cerrada');
@@ -248,18 +231,15 @@ const gracefulShutdown = (signal) => {
     });
   });
 
-  // Forzar cierre después de 30 segundos
   setTimeout(() => {
     logger.error('⚠️  Shutdown forzado después de 30s');
     process.exit(1);
   }, 30000);
 };
 
-// Escuchar señales de terminación
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
-// Capturar errores no manejados
 process.on('unhandledRejection', (reason, promise) => {
   logger.error('Promesa rechazada no manejada:', {
     reason,

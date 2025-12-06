@@ -7,7 +7,6 @@ const crypto = require('crypto');
 const passport = require('../config/passport');
 const { sendPasswordResetEmail, sendWelcomeEmail } = require('../services/emailService');
 
-
 router.post('/register', async (req, res) => {
   try {
     const { 
@@ -50,12 +49,11 @@ router.post('/register', async (req, res) => {
     
     const user = new User(userData);
     await user.save();
-     // Enviar email de bienvenida (opcional, no bloquea el registro)
+
     try {
       await sendWelcomeEmail(user.email, user.fullName);
     } catch (emailError) {
       console.error('Error al enviar email de bienvenida:', emailError);
-      // No bloqueamos el registro si falla el email
     }
             
     res.status(201).json({ 
@@ -80,24 +78,32 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     
+    console.log('[LOGIN] Intento de login para:', email);
+    
     const user = await User.findOne({ email });
     if (!user) {
+      console.log('[LOGIN] Usuario NO encontrado:', email);
       return res.status(400).json({ 
         success: false,
         message: 'Credenciales inválidas' 
       });
     }
+    
+    console.log('[LOGIN] Usuario encontrado:', user.fullName, '-', user.userType);
     
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
+      console.log('[LOGIN] Contraseña incorrecta');
       return res.status(400).json({ 
         success: false,
         message: 'Credenciales inválidas' 
       });
     }
     
-    // Verificar si es becado pendiente (pero NO si es admin)
+    console.log('[LOGIN] Contraseña válida');
+    
     if (user.userType === 'becado' && user.scholarship && user.scholarship.status === 'pending') {
+      console.log('[LOGIN] Becado con solicitud pendiente');
       return res.status(403).json({ 
         success: false,
         message: 'Tu solicitud de beca está en revisión. Te notificaremos pronto.' 
@@ -114,6 +120,8 @@ router.post('/login', async (req, res) => {
       { expiresIn: '7d' }
     );
     
+    console.log('[LOGIN] Login exitoso, token generado');
+    
     res.json({ 
       success: true,
       token,
@@ -126,7 +134,7 @@ router.post('/login', async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error en login:', error);
+    console.error('[LOGIN] Error en login:', error);
     res.status(500).json({ 
       success: false,
       message: 'Error al iniciar sesión',
@@ -134,28 +142,25 @@ router.post('/login', async (req, res) => {
     });
   }
 });
-// Solicitar recuperación de contraseña
+
 router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
     
     const user = await User.findOne({ email });
     if (!user) {
-      // Por seguridad, no revelamos si el email existe o no
       return res.json({ 
         success: true,
         message: 'Si el email existe, recibirás un enlace de recuperación.' 
       });
     }
     
-    // Generar token de reset
     const resetToken = crypto.randomBytes(32).toString('hex');
     user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-    user.resetPasswordExpires = Date.now() + 3600000; // 1 hora
+    user.resetPasswordExpires = Date.now() + 3600000;
     
     await user.save();
     
-    // Enviar email
     const emailResult = await sendPasswordResetEmail(email, resetToken);
     
     if (emailResult.success) {
@@ -179,7 +184,6 @@ router.post('/forgot-password', async (req, res) => {
   }
 });
 
-// Verificar token de reset
 router.get('/reset-password/:token', async (req, res) => {
   try {
     const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
@@ -210,7 +214,7 @@ router.get('/reset-password/:token', async (req, res) => {
     });
   }
 });
-// Restablecer contraseña
+
 router.post('/reset-password/:token', async (req, res) => {
   try {
     const { password } = req.body;
@@ -236,7 +240,6 @@ router.post('/reset-password/:token', async (req, res) => {
       });
     }
     
-    // Actualizar contraseña
     user.password = await bcrypt.hash(password, 10);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
@@ -256,7 +259,6 @@ router.post('/reset-password/:token', async (req, res) => {
   }
 });
 
-// Cambiar contraseña (usuario autenticado)
 router.post('/change-password', async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -279,7 +281,6 @@ router.post('/change-password', async (req, res) => {
       });
     }
     
-    // Verificar contraseña actual
     const isValidPassword = await bcrypt.compare(currentPassword, user.password);
     if (!isValidPassword) {
       return res.status(400).json({ 
@@ -288,7 +289,6 @@ router.post('/change-password', async (req, res) => {
       });
     }
     
-    // Actualizar contraseña
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
     
@@ -305,7 +305,7 @@ router.post('/change-password', async (req, res) => {
     });
   }
 });
-// ============= RUTAS OAUTH =============// Google
+
 router.get('/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
@@ -313,7 +313,6 @@ router.get('/google',
 router.get('/google/callback',
   passport.authenticate('google', { session: false, failureRedirect: `${process.env.FRONTEND_URL}/login?error=google` }),
   (req, res) => {
-    // Crear token JWT
     const token = jwt.sign(
       { 
         userId: req.user._id, 
@@ -324,7 +323,6 @@ router.get('/google/callback',
       { expiresIn: '7d' }
     );
 
-    // Redirigir al frontend con el token
     res.redirect(`${process.env.FRONTEND_URL}/auth/success?token=${token}&user=${encodeURIComponent(JSON.stringify({
       id: req.user._id,
       fullName: req.user.fullName,
@@ -334,7 +332,6 @@ router.get('/google/callback',
   }
 );
 
-// GitHub
 router.get('/github',
   passport.authenticate('github', { scope: ['user:email'] })
 );
@@ -361,30 +358,4 @@ router.get('/github/callback',
   }
 );
 
-// Facebook
-router.get('/facebook',
-  passport.authenticate('facebook', { scope: ['email'] })
-);
-
-router.get('/facebook/callback',
-  passport.authenticate('facebook', { session: false, failureRedirect: `${process.env.FRONTEND_URL}/login?error=facebook` }),
-  (req, res) => {
-    const token = jwt.sign(
-      { 
-        userId: req.user._id, 
-        email: req.user.email,
-        userType: req.user.userType 
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    res.redirect(`${process.env.FRONTEND_URL}/auth/success?token=${token}&user=${encodeURIComponent(JSON.stringify({
-      id: req.user._id,
-      fullName: req.user.fullName,
-      email: req.user.email,
-      userType: req.user.userType
-    }))}`);
-  }
-);
 module.exports = router;
